@@ -1,0 +1,8 @@
+[package]
+name = "rustlike"
+version = "0.1.0"
+authors = ["Pablo Ordoñez <pablo@miracledevs.com>"]
+
+[dependencies]
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["winnt", "winbase", "winuser", "wincon", "fileapi", "handleapi", "processenv"] }
