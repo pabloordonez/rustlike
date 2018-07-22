@@ -10,7 +10,13 @@ use windows::terminal::WindowsTerminal;
 
 fn main() {
     let terminal = WindowsTerminal::new();
-    let size = terminal.get_size();
+    terminal.set_window_position(0, 0);
+    terminal.set_window_size(800, 600);
+    terminal.clear();
+    terminal.set_cursor(0, 0);
+    terminal.set_cursor_visibility(false);
+
+    let size = terminal.get_console_size();
 
     let player = Cell::new('@', Color::Green, Color::Blue);
     let background = Cell::new(' ', Color::Black, Color::Green);
@@ -23,10 +29,6 @@ fn main() {
     let mut fps = 0;
     let mut frames = 0;
     let mut duration = Duration::from_micros(0);
-
-    terminal.clear();
-    terminal.set_cursor(0, 0);
-    terminal.set_cursor_visibility(false);
 
     let mut ox: f32 = 0.0;
     let mut oy: f32 = 0.0;

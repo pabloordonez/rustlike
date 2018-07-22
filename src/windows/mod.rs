@@ -1,7 +1,8 @@
 extern crate winapi;
 
+use windows::winapi::shared::windef::{LPRECT,RECT};
 use windows::winapi::um::wincon::{
-    CONSOLE_SCREEN_BUFFER_INFO, CONSOLE_CURSOR_INFO, COORD, SMALL_RECT,
+    CONSOLE_SCREEN_BUFFER_INFO, CONSOLE_CURSOR_INFO, COORD, SMALL_RECT
 };
 
 use super::core::color::Color;
@@ -25,6 +26,17 @@ impl Empty for SMALL_RECT {
             Right: 0,
             Bottom: 0,
             Left: 0,
+        }
+    }
+}
+
+impl Empty for RECT {
+    fn empty() -> RECT {
+        RECT {
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0
         }
     }
 }
