@@ -1,4 +1,5 @@
 pub mod cell;
-pub mod cellbuffer;
+pub mod cell_buffer;
 pub mod color;
 pub mod terminal;
+pub mod mouse;

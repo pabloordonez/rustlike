@@ -1,4 +1,4 @@
-use core::cellbuffer::CellBuffer;
+use core::cell_buffer::CellBuffer;
 
 pub trait Terminal {
 
@@ -16,6 +16,12 @@ pub trait Terminal {
 
     /// Gets the current console size in character units.
     fn get_console_size(&self) -> (usize, usize);
+
+    /// Gets the window client area size.
+    fn get_window_client_size(&self) -> (usize, usize);
+
+    /// Gets the character size in pixel units.
+    fn get_char_size(&self) -> (usize, usize);
 
     /// Gets the window size.
     fn get_window_size(&self) -> (usize, usize);

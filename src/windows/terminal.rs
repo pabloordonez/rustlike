@@ -1,23 +1,23 @@
 extern crate winapi;
 use windows::winapi::ctypes::c_void;
-use windows::winapi::shared::windef::{HWND,RECT};
+use windows::winapi::shared::windef::{HWND, RECT};
 use windows::winapi::um::fileapi::CreateFileW;
 use windows::winapi::um::handleapi::CloseHandle;
 use windows::winapi::um::processenv::GetStdHandle;
-use windows::winapi::um::winbase::{STD_INPUT_HANDLE, STD_OUTPUT_HANDLE};
-use windows::winapi::um::winuser::{GetWindowRect,SetWindowPos};
+use windows::winapi::um::winbase::STD_OUTPUT_HANDLE;
 use windows::winapi::um::wincon::{
-    CHAR_INFO_Char, GetConsoleCursorInfo, GetConsoleScreenBufferInfo, SetConsoleCursorInfo,
-    SetConsoleCursorPosition, WriteConsoleOutputW, GetConsoleWindow, CHAR_INFO, CONSOLE_CURSOR_INFO,
-    CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
+    CHAR_INFO_Char, GetConsoleCursorInfo, GetConsoleScreenBufferInfo, GetConsoleWindow,
+    SetConsoleCursorInfo, SetConsoleCursorPosition, WriteConsoleOutputW, CHAR_INFO,
+    CONSOLE_CURSOR_INFO, CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
 };
 use windows::winapi::um::winnt::HANDLE;
+use windows::winapi::um::winuser::{GetClientRect, GetWindowRect, SetWindowPos};
 
 use std::mem::transmute;
 use std::ptr::null_mut;
 
 use super::super::core::cell::Cell;
-use super::super::core::cellbuffer::CellBuffer;
+use super::super::core::cell_buffer::CellBuffer;
 use super::super::core::terminal::Terminal;
 use super::{get_background_color, get_foreground_color, get_wstring, Empty};
 
@@ -25,7 +25,7 @@ use super::{get_background_color, get_foreground_color, get_wstring, Empty};
 pub struct WindowsTerminal {
     pub console_handle: *mut c_void,
     pub output_handle: HANDLE,
-    pub window_handle: HWND
+    pub window_handle: HWND,
 }
 
 #[allow(dead_code)]
@@ -44,7 +44,7 @@ impl Terminal for WindowsTerminal {
                 )
             },
             output_handle: unsafe { GetStdHandle(STD_OUTPUT_HANDLE) },
-            window_handle: unsafe { GetConsoleWindow() }
+            window_handle: unsafe { GetConsoleWindow() },
         }
     }
 
@@ -60,11 +60,7 @@ impl Terminal for WindowsTerminal {
             panic!("Problems trying to obtain the console cursor info.");
         }
 
-        if visible {
-            console_cursor_info.bVisible = 1;
-        } else {
-            console_cursor_info.bVisible = 0;
-        }
+        console_cursor_info.bVisible = if visible { 1 } else { 0 };
 
         let success = unsafe { SetConsoleCursorInfo(self.output_handle, &mut console_cursor_info) };
 
@@ -74,8 +70,15 @@ impl Terminal for WindowsTerminal {
     }
 
     fn set_cursor(&self, x: u16, y: u16) {
-        let success: i32 =
-            unsafe { SetConsoleCursorPosition(self.output_handle, COORD { X: x as i16, Y: y as i16 }) };
+        let success: i32 = unsafe {
+            SetConsoleCursorPosition(
+                self.output_handle,
+                COORD {
+                    X: x as i16,
+                    Y: y as i16,
+                },
+            )
+        };
 
         if success == 0 {
             panic!("Couldn't set the console cursor position.");
@@ -102,9 +105,7 @@ impl Terminal for WindowsTerminal {
 
     fn get_window_size(&self) -> (usize, usize) {
         let mut rect = RECT::empty();
-        let success = unsafe {
-            GetWindowRect(self.window_handle, &mut rect)
-        };
+        let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
             panic!("Problems trying to obtain the window rect.");
@@ -116,18 +117,52 @@ impl Terminal for WindowsTerminal {
         )
     }
 
+    fn get_window_client_size(&self) -> (usize, usize) {
+        let mut rect = RECT::empty();
+        let success = unsafe { GetClientRect(self.window_handle, &mut rect) };
+
+        if success == 0 {
+            panic!("Problems trying to obtain the client rect.");
+        }
+
+        (
+            (rect.right - rect.left) as usize,
+            (rect.bottom - rect.top) as usize,
+        )
+    }
+
+    fn get_char_size(&self) -> (usize, usize) {
+        let console_size = self.get_console_size();
+        let client_size = self.get_window_client_size();
+
+        if console_size.0 == 0 || console_size.1 == 0 {
+            return (0, 0);
+        }
+
+        (
+            client_size.0 / console_size.0,
+            client_size.1 / console_size.1,
+        )
+    }
+
     fn set_window_size(&self, width: usize, height: usize) {
         let mut rect = RECT::empty();
-        let success = unsafe {
-            GetWindowRect(self.window_handle, &mut rect)
-        };
+        let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
             panic!("Problems trying to obtain the window rect.");
         }
 
         let success = unsafe {
-            SetWindowPos(self.window_handle, 0 as HWND, rect.top, rect.left, width as i32, height as i32, 0x0020 | 0x0040)
+            SetWindowPos(
+                self.window_handle,
+                0 as HWND,
+                rect.top,
+                rect.left,
+                width as i32,
+                height as i32,
+                0x0020 | 0x0040,
+            )
         };
 
         if success == 0 {
@@ -137,32 +172,33 @@ impl Terminal for WindowsTerminal {
 
     fn get_window_position(&self) -> (usize, usize) {
         let mut rect = RECT::empty();
-        let success = unsafe {
-            GetWindowRect(self.window_handle, &mut rect)
-        };
+        let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
             panic!("Problems trying to obtain the window rect.");
         }
 
-        (
-            rect.left as usize,
-            rect.top as usize,
-        )
+        (rect.left as usize, rect.top as usize)
     }
 
     fn set_window_position(&self, x: usize, y: usize) {
         let mut rect = RECT::empty();
-        let success = unsafe {
-            GetWindowRect(self.window_handle, &mut rect)
-        };
+        let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
             panic!("Problems trying to obtain the window rect.");
         }
 
         let success = unsafe {
-            SetWindowPos(self.window_handle, 0 as HWND, x as i32, y as i32, rect.right - rect.left, rect.bottom - rect.top, 0x0020 | 0x0040)
+            SetWindowPos(
+                self.window_handle,
+                0 as HWND,
+                x as i32,
+                y as i32,
+                rect.right - rect.left,
+                rect.bottom - rect.top,
+                0x0020 | 0x0040,
+            )
         };
 
         if success == 0 {

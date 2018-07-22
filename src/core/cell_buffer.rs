@@ -19,6 +19,12 @@ impl CellBuffer {
         }
     }
 
+    pub fn resize(&mut self, default_cell: Cell, new_width: usize, new_height: usize) {
+        self.width = new_width;
+        self.height = new_height;
+        self.cells = vec![default_cell;new_width * new_height];
+    }
+
     #[inline]
     pub fn index_of(&self, x: usize, y: usize) -> usize {
         x + self.width * y
@@ -26,6 +32,10 @@ impl CellBuffer {
 
     #[inline]
     pub fn coordinates_of(&self, index: usize) -> (usize, usize) {
+        if self.width == 0 {
+            return (0, 0)
+        }
+
         (index % self.width, index / self.width)
     }
 
@@ -39,7 +49,9 @@ impl CellBuffer {
     #[inline]
     pub fn set(&mut self, x: usize, y: usize, cell: Cell) {
         let index = self.index_of(x, y);
-        assert!(index < self.cells.len());
+        if index >= self.cells.len() {
+            return;
+        }
         self.cells[index] = cell;
     }
 

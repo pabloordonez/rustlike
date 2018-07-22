@@ -1,16 +1,24 @@
 extern crate winapi;
 
-use windows::winapi::shared::windef::{LPRECT,RECT};
+use windows::winapi::shared::windef::{POINT, RECT};
 use windows::winapi::um::wincon::{
-    CONSOLE_SCREEN_BUFFER_INFO, CONSOLE_CURSOR_INFO, COORD, SMALL_RECT
+    CONSOLE_CURSOR_INFO, CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
 };
 
 use super::core::color::Color;
 
 pub mod terminal;
 
+pub mod mouse;
+
 pub trait Empty {
     fn empty() -> Self;
+}
+
+impl Empty for POINT {
+    fn empty() -> POINT {
+        POINT { x: 0, y: 0 }
+    }
 }
 
 impl Empty for COORD {
@@ -36,7 +44,7 @@ impl Empty for RECT {
             left: 0,
             top: 0,
             right: 0,
-            bottom: 0
+            bottom: 0,
         }
     }
 }
@@ -57,7 +65,7 @@ impl Empty for CONSOLE_CURSOR_INFO {
     fn empty() -> CONSOLE_CURSOR_INFO {
         CONSOLE_CURSOR_INFO {
             dwSize: 0,
-            bVisible: 0
+            bVisible: 0,
         }
     }
 }
@@ -72,8 +80,7 @@ pub fn get_wstring(msg: &str) -> Vec<u16> {
 }
 
 #[inline]
-pub fn get_foreground_color(color: Color) -> u16
-{
+pub fn get_foreground_color(color: Color) -> u16 {
     match color {
         Color::Black => 0,
         Color::DarkBlue => 1,
@@ -87,16 +94,15 @@ pub fn get_foreground_color(color: Color) -> u16
         Color::Blue => 9,
         Color::Green => 10,
         Color::Cyan => 11,
-        Color::Red=> 12,
+        Color::Red => 12,
         Color::Magenta => 13,
         Color::Yellow => 14,
-        Color::White => 15
+        Color::White => 15,
     }
 }
 
 #[inline]
-pub fn get_background_color(color: Color) -> u16
-{
+pub fn get_background_color(color: Color) -> u16 {
     match color {
         Color::Black => 0,
         Color::DarkBlue => 16,
@@ -110,9 +116,9 @@ pub fn get_background_color(color: Color) -> u16
         Color::Blue => 144,
         Color::Green => 160,
         Color::Cyan => 176,
-        Color::Red=> 192,
+        Color::Red => 192,
         Color::Magenta => 208,
         Color::Yellow => 224,
-        Color::White => 240
+        Color::White => 240,
     }
 }
