@@ -17,5 +17,5 @@ pub enum Color {
     DarkCyan,
     Grey,
     DarkGrey,
-    White
+    White,
 }

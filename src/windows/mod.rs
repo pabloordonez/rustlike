@@ -7,6 +7,8 @@ use windows::winapi::um::wincon::{
 
 use super::core::color::Color;
 
+pub mod window;
+
 pub mod terminal;
 
 pub mod mouse;

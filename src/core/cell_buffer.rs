@@ -1,65 +1,75 @@
 use core::cell::Cell;
 use core::color::Color;
+use core::point_2d::Point2d;
+use core::size_2d::Size2d;
+use std::slice::Iter;
 use std::str::Chars;
 
 #[derive(Debug)]
 pub struct CellBuffer {
-    pub width: usize,
-    pub height: usize,
-    pub cells: Vec<Cell>,
+    pub size: Size2d,
+    cells: Vec<Cell>,
 }
 
 #[allow(dead_code)]
 impl CellBuffer {
-    pub fn new(default_cell: Cell, width: usize, height: usize) -> CellBuffer {
+    pub fn new(default_cell: Cell, size: Size2d) -> CellBuffer {
         CellBuffer {
-            width,
-            height,
-            cells: vec![default_cell; width * height],
+            size,
+            cells: vec![default_cell; size.width * size.height],
         }
     }
 
-    pub fn resize(&mut self, default_cell: Cell, new_width: usize, new_height: usize) {
-        self.width = new_width;
-        self.height = new_height;
-        self.cells = vec![default_cell;new_width * new_height];
+    pub fn iter(&self) -> Iter<'_, Cell> {
+        self.cells.iter()
+    }
+
+    pub fn resize(&mut self, default_cell: Cell, new_size: Size2d) {
+        self.size = new_size;
+        self.cells = vec![default_cell; new_size.width * new_size.height];
     }
 
     #[inline]
-    pub fn index_of(&self, x: usize, y: usize) -> usize {
-        x + self.width * y
+    pub fn index_of(&self, position: Point2d) -> usize {
+        position.x + self.size.width * position.y
     }
 
     #[inline]
-    pub fn coordinates_of(&self, index: usize) -> (usize, usize) {
-        if self.width == 0 {
-            return (0, 0)
+    pub fn coordinates_of(&self, index: usize) -> Point2d {
+        if self.size.is_empty() || self.size.width == 0 || self.size.height == 0 {
+            return Point2d::empty();
         }
 
-        (index % self.width, index / self.width)
+        Point2d::new(index % self.size.width, index / self.size.width)
     }
 
     #[inline]
-    pub fn get(&self, x: usize, y: usize) -> Cell {
-        let index = self.index_of(x, y);
+    pub fn get(&self, position: Point2d) -> Cell {
+        let index = self.index_of(position);
         assert!(index < self.cells.len());
         self.cells[index]
     }
 
     #[inline]
-    pub fn set(&mut self, x: usize, y: usize, cell: Cell) {
-        let index = self.index_of(x, y);
+    pub fn set(&mut self, position: Point2d, cell: Cell) {
+        let index = self.index_of(position);
         if index >= self.cells.len() {
             return;
         }
         self.cells[index] = cell;
     }
 
-    pub fn write_chars(&mut self, text: Chars, x: usize, y: usize, foreground: Color, background: Color) {
+    pub fn write_chars(
+        &mut self,
+        text: Chars,
+        position: Point2d,
+        foreground: Color,
+        background: Color,
+    ) {
         let mut index = 0;
 
         for character in text {
-            let buffer_index = self.index_of(x + index, y);
+            let buffer_index = self.index_of(position.add_x(index));
 
             if buffer_index >= self.cells.len() {
                 break;
@@ -73,17 +83,29 @@ impl CellBuffer {
         }
     }
 
-    pub fn write_str(&mut self, text: &str, x: usize, y: usize, foreground: Color, background: Color) {
-        self.write_chars(text.chars(), x, y, foreground, background);
+    pub fn write_str(
+        &mut self,
+        text: &str,
+        position: Point2d,
+        foreground: Color,
+        background: Color,
+    ) {
+        self.write_chars(text.chars(), position, foreground, background);
     }
 
-    pub fn write_string(&mut self, text: &String, x: usize, y: usize, foreground: Color, background: Color) {
-        self.write_chars(text.chars(), x, y, foreground, background);
+    pub fn write_string(
+        &mut self,
+        text: &String,
+        position: Point2d,
+        foreground: Color,
+        background: Color,
+    ) {
+        self.write_chars(text.chars(), position, foreground, background);
     }
 
-    pub fn repeat_cell(&mut self, cell: Cell, x: usize, y: usize, length: usize) {
+    pub fn repeat_cell(&mut self, cell: Cell, position: Point2d, length: usize) {
         for index in 0..length {
-            let index = self.index_of(x + index, y);
+            let index = self.index_of(position.add_x(index));
 
             if index >= self.cells.len() {
                 break;
@@ -93,24 +115,25 @@ impl CellBuffer {
         }
     }
 
-    pub fn write_cell_buffer(&mut self, cell_buffer: &CellBuffer, x: usize, y: usize) {
+    pub fn write_cell_buffer(&mut self, cell_buffer: &CellBuffer, position: Point2d) {
+        for cby in 0..cell_buffer.size.height {
+            let destination_y = position.y + cby;
 
-        for cby in 0..cell_buffer.height {
-
-            let destination_y = y + cby;
-
-            if destination_y >= self.height {
+            if destination_y >= self.size.height {
                 break;
             }
 
-            for cbx in 0..cell_buffer.width {
-                let destination_x = x + cbx;
+            for cbx in 0..cell_buffer.size.width {
+                let destination_x = position.x + cbx;
 
-                if destination_x >= self.width {
+                if destination_x >= self.size.width {
                     break;
                 }
 
-                self.set(destination_x, destination_y, cell_buffer.get(cbx, cby));
+                self.set(
+                    Point2d::new(destination_x, destination_y),
+                    cell_buffer.get(Point2d::new(cbx, cby)),
+                );
             }
         }
     }
