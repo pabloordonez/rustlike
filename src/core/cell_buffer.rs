@@ -105,13 +105,13 @@ impl CellBuffer {
 
     pub fn repeat_cell(&mut self, cell: Cell, position: Point2d, length: usize) {
         for index in 0..length {
-            let index = self.index_of(position.add_x(index));
+            let buffer_index = self.index_of(position.add_x(index));
 
-            if index >= self.cells.len() {
+            if buffer_index >= self.cells.len() {
                 break;
             }
 
-            self.cells[index] = cell;
+            self.cells[buffer_index] = cell;
         }
     }
 

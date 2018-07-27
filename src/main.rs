@@ -44,7 +44,7 @@ fn draw_stats(window: &Window, terminal: &Terminal, buffer: &mut CellBuffer, fps
 
     buffer.write_cell_buffer(&square, Point2d::new(10, 10));
     buffer.repeat_cell(text_background, Point2d::new(0, 0), console_size.width);
-    buffer.repeat_cell(separator, Point2d::new(0, 1), console_size.height);
+    buffer.repeat_cell(separator, Point2d::new(0, 1), console_size.width);
     buffer.write_string(
         &format!(
             "FPS: {}   Window({}, {})   Console({}, {})   Char({}, {})",
@@ -112,9 +112,6 @@ fn main() {
     window.set_window_size(Size2d::new(800, 600));
 
     let mouse = Box::new(WindowsMouse::new());
-    mouse.show_cursor(false);
-    mouse.show_cursor(true);
-    mouse.show_cursor(false);
     mouse.show_cursor(false);
 
     let terminal = Box::new(WindowsTerminal::new());

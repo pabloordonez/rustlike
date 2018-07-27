@@ -6,13 +6,13 @@ use windows::winapi::um::handleapi::CloseHandle;
 use windows::winapi::um::processenv::GetStdHandle;
 use windows::winapi::um::winbase::STD_OUTPUT_HANDLE;
 use windows::winapi::um::wincon::{
-    CHAR_INFO_Char, GetConsoleCursorInfo, GetConsoleScreenBufferInfo, GetConsoleWindow,
-    SetConsoleCursorInfo, SetConsoleCursorPosition, WriteConsoleOutputW, CHAR_INFO,
-    CONSOLE_CURSOR_INFO, CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
+    GetConsoleCursorInfo, GetConsoleScreenBufferInfo, GetConsoleWindow, SetConsoleCursorInfo,
+    SetConsoleCursorPosition, WriteConsoleOutputW, CHAR_INFO, CONSOLE_CURSOR_INFO,
+    CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
 };
 use windows::winapi::um::winnt::HANDLE;
 
-use std::mem::transmute;
+use std::mem::zeroed;
 use std::ptr::null_mut;
 
 use super::super::core::cell::Cell;
@@ -124,14 +124,15 @@ impl Terminal for WindowsTerminal {
         let size = self.get_console_size();
         let width = size.width as i16;
         let height = size.height as i16;
+        let mut char_info: CHAR_INFO;
 
-        let char_info_array = vec![
-            CHAR_INFO {
-                Attributes: 0,
-                Char: unsafe { transmute::<u16, CHAR_INFO_Char>(' ' as u16) },
-            };
-            (width * height) as usize
-        ];
+        unsafe {
+            char_info = zeroed();
+            char_info.Attributes = 0;
+            *char_info.Char.UnicodeChar_mut() = ' ' as u16;
+        }
+
+        let char_info_array = vec![char_info; (width * height) as usize];
 
         let mut rect = SMALL_RECT {
             Left: 0,
@@ -161,10 +162,12 @@ impl Terminal for WindowsTerminal {
     fn write(&self, cell_buffer: &CellBuffer) {
         let char_info_array = cell_buffer
             .iter()
-            .map(|cell: &Cell| CHAR_INFO {
-                Attributes: get_foreground_color(cell.foreground)
-                    | get_background_color(cell.background),
-                Char: unsafe { transmute::<u16, CHAR_INFO_Char>(cell.character as u16) },
+            .map(|cell: &Cell| unsafe {
+                let mut char_info: CHAR_INFO = zeroed();
+                char_info.Attributes =
+                    get_foreground_color(cell.foreground) | get_background_color(cell.background);
+                *char_info.Char.UnicodeChar_mut() = cell.character as u16;
+                char_info
             })
             .collect::<Vec<CHAR_INFO>>();
 
