@@ -23,19 +23,19 @@ impl WindowsMouse {
 }
 
 impl Mouse for WindowsMouse {
-    fn get_absolute_position(&self) -> Point2d {
+    fn get_absolute_position(&self) -> Result<Point2d, &'static str> {
         let mut point = POINT::empty();
         let success = unsafe { GetCursorPos(&mut point) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the cursor position.");
+            return Err("Problems trying to obtain the cursor position.");
         }
 
-        Point2d::new(point.x as usize, point.y as usize)
+        Ok(Point2d::new(point.x as usize, point.y as usize))
     }
 
-    fn get_client_position(&self) -> Point2d {
-        let position = self.get_absolute_position();
+    fn get_client_position(&self) -> Result<Point2d, &'static str> {
+        let position = self.get_absolute_position()?;
         let mut point = POINT {
             x: position.x as i32,
             y: position.y as i32,
@@ -44,25 +44,29 @@ impl Mouse for WindowsMouse {
         let success = unsafe { ScreenToClient(self.window_handle, &mut point) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the client cursor position.");
+            return Err("Problems trying to obtain the client cursor position.");
         }
 
-        Point2d::new(point.x as usize, point.y as usize)
+        Ok(Point2d::new(point.x as usize, point.y as usize))
     }
 
-    fn set_position(&self, position: Point2d) {
+    fn set_position(&self, position: Point2d) -> Result<(), &'static str> {
         let success = unsafe { SetCursorPos(position.x as i32, position.y as i32) };
 
         if success == 0 {
-            panic!("Problems trying to set the cursor position.");
+            return Err("Problems trying to set the cursor position.");
         }
+
+        Ok(())
     }
 
-    fn show_cursor(&self, visible: bool) {
+    fn show_cursor(&self, visible: bool) -> Result<(), &'static str> {
         if visible {
             unsafe { SetCursor(LoadCursorW(null_mut(), IDC_ARROW)) }
         } else {
             unsafe { SetCursor(null_mut()) }
         };
+
+        Ok(())
     }
 }

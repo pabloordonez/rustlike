@@ -52,16 +52,17 @@ impl WindowsTerminal {
 
 #[allow(dead_code)]
 impl Terminal for WindowsTerminal {
-    fn dispose(&self) {
+    fn dispose(&self) -> Result<(), &'static str> {
         unsafe { CloseHandle(self.console_handle) };
+        Ok(())
     }
 
-    fn set_cursor_visibility(&self, visible: bool) {
+    fn set_cursor_visibility(&self, visible: bool) -> Result<(), &'static str> {
         let mut console_cursor_info = CONSOLE_CURSOR_INFO::empty();
         let success = unsafe { GetConsoleCursorInfo(self.output_handle, &mut console_cursor_info) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the console cursor info.");
+            return Err("Problems trying to obtain the console cursor info.");
         }
 
         console_cursor_info.bVisible = if visible { 1 } else { 0 };
@@ -69,11 +70,13 @@ impl Terminal for WindowsTerminal {
         let success = unsafe { SetConsoleCursorInfo(self.output_handle, &mut console_cursor_info) };
 
         if success == 0 {
-            panic!("Problems trying to set the console cursor info.");
+            return Err("Problems trying to set the console cursor info.");
         }
+
+        Ok(())
     }
 
-    fn set_cursor(&self, position: Point2d) {
+    fn set_cursor(&self, position: Point2d) -> Result<(), &'static str> {
         let success: i32 = unsafe {
             SetConsoleCursorPosition(
                 self.output_handle,
@@ -85,43 +88,46 @@ impl Terminal for WindowsTerminal {
         };
 
         if success == 0 {
-            panic!("Couldn't set the console cursor position.");
+            return Err("Couldn't set the console cursor position.");
         }
+
+        Ok(())
     }
 
-    fn get_console_size(&self) -> Size2d {
+    fn get_console_size(&self) -> Result<Size2d, &'static str> {
         let mut console_screen_buffer_info = CONSOLE_SCREEN_BUFFER_INFO::empty();
         let success = unsafe {
             GetConsoleScreenBufferInfo(self.output_handle, &mut console_screen_buffer_info)
         };
 
         if success == 0 {
-            panic!("Problems trying to obtain the screen buffer info.");
+            return Err("Problems trying to obtain the screen buffer info.");
         }
 
         let window = console_screen_buffer_info.srWindow;
-        Size2d::new(
+
+        Ok(Size2d::new(
             (window.Right - window.Left + 1) as usize,
             (window.Bottom - window.Top + 1) as usize,
-        )
+        ))
     }
 
-    fn get_char_size(&self, window: &Window) -> Size2d {
-        let console_size = self.get_console_size();
-        let client_size = window.get_window_client_size();
+    fn get_char_size(&self, window: &Window) -> Result<Size2d, &'static str> {
+        let console_size = self.get_console_size()?;
+        let client_size = window.get_window_client_size()?;
 
         if console_size.is_empty() {
-            return Size2d::empty();
+            return Ok(Size2d::empty());
         }
 
-        Size2d::new(
+        Ok(Size2d::new(
             client_size.width / console_size.width,
             client_size.height / console_size.height,
-        )
+        ))
     }
 
-    fn clear(&self) {
-        let size = self.get_console_size();
+    fn clear(&self) -> Result<(), &'static str> {
+        let size = self.get_console_size()?;
         let width = size.width as i16;
         let height = size.height as i16;
         let mut char_info: CHAR_INFO;
@@ -155,11 +161,13 @@ impl Terminal for WindowsTerminal {
         };
 
         if success == 0 {
-            panic!("Couldn't clear console output.");
+            return Err("Couldn't clear console output.");
         }
+
+        Ok(())
     }
 
-    fn write(&self, cell_buffer: &CellBuffer) {
+    fn write(&self, cell_buffer: &CellBuffer) -> Result<(), &'static str> {
         let char_info_array = cell_buffer
             .iter()
             .map(|cell: &Cell| unsafe {
@@ -192,7 +200,9 @@ impl Terminal for WindowsTerminal {
         };
 
         if success == 0 {
-            panic!("Couldn't write to the console output.");
+            return Err("Couldn't write to the console output.");
         }
+
+        Ok(())
     }
 }

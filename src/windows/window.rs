@@ -22,40 +22,40 @@ impl WindowsWindow {
 
 #[allow(dead_code)]
 impl Window for WindowsWindow {
-    fn get_window_size(&self) -> Size2d {
+    fn get_window_size(&self) ->  Result<Size2d, &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the window rect.");
+            return Err("Problems trying to obtain the window rect.");
         }
 
-        Size2d::new(
+        Ok(Size2d::new(
             (rect.right - rect.left) as usize,
             (rect.bottom - rect.top) as usize,
-        )
+        ))
     }
 
-    fn get_window_client_size(&self) -> Size2d {
+    fn get_window_client_size(&self) ->  Result<Size2d, &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetClientRect(self.window_handle, &mut rect) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the client rect.");
+            return Err("Problems trying to obtain the client rect.");
         }
 
-        Size2d::new(
+        Ok(Size2d::new(
             (rect.right - rect.left) as usize,
             (rect.bottom - rect.top) as usize,
-        )
+        ))
     }
 
-    fn set_window_size(&self, size: Size2d) {
+    fn set_window_size(&self, size: Size2d) -> Result<(), &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the window rect.");
+            return Err("Problems trying to obtain the window rect.");
         }
 
         let success = unsafe {
@@ -71,27 +71,29 @@ impl Window for WindowsWindow {
         };
 
         if success == 0 {
-            panic!("Problem trying to set the windows size.");
+            return Err("Problem trying to set the windows size.");
         }
+
+        Ok(())
     }
 
-    fn get_window_position(&self) -> Point2d {
+    fn get_window_position(&self) -> Result<Point2d, &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the window rect.");
+            return Err("Problems trying to obtain the window rect.");
         }
 
-        Point2d::new(rect.left as usize, rect.top as usize)
+        Ok(Point2d::new(rect.left as usize, rect.top as usize))
     }
 
-    fn set_window_position(&self, position: Point2d) {
+    fn set_window_position(&self, position: Point2d)  -> Result<(), &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
         if success == 0 {
-            panic!("Problems trying to obtain the window rect.");
+            return Err("Problems trying to obtain the window rect.");
         }
 
         let success = unsafe {
@@ -107,7 +109,9 @@ impl Window for WindowsWindow {
         };
 
         if success == 0 {
-            panic!("Problem trying to set the windows position.");
+            return Err("Problem trying to set the windows position.");
         }
+
+        Ok(())
     }
 }

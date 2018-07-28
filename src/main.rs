@@ -23,7 +23,7 @@ struct Player {
 }
 
 fn check_size(terminal: &Terminal, buffer: &mut CellBuffer) {
-    let size = terminal.get_console_size();
+    let size = terminal.get_console_size().unwrap();
 
     if size.width != buffer.size.width || size.height != buffer.size.height {
         buffer.resize(Cell::new(' ', Color::Black, Color::Green), size);
@@ -38,9 +38,9 @@ fn draw_stats(window: &Window, terminal: &Terminal, buffer: &mut CellBuffer, fps
         Size2d::new(5, 5),
     );
 
-    let console_size = terminal.get_console_size();
-    let window_size = window.get_window_client_size();
-    let char_size = terminal.get_char_size(window);
+    let console_size = terminal.get_console_size().unwrap();
+    let window_size = window.get_window_client_size().unwrap();
+    let char_size = terminal.get_char_size(window).unwrap();
 
     buffer.write_cell_buffer(&square, Point2d::new(10, 10));
     buffer.repeat_cell(text_background, Point2d::new(0, 0), console_size.width);
@@ -63,7 +63,7 @@ fn draw_stats(window: &Window, terminal: &Terminal, buffer: &mut CellBuffer, fps
 }
 
 fn draw_player(terminal: &Terminal, buffer: &mut CellBuffer, player: &mut Player) {
-    let console_size = terminal.get_console_size();
+    let console_size = terminal.get_console_size().unwrap();
     let player_cell = Cell::new('@', Color::Green, Color::Blue);
     let background_cell = Cell::new(' ', Color::Black, Color::Green);
 
@@ -92,8 +92,8 @@ fn draw_player(terminal: &Terminal, buffer: &mut CellBuffer, player: &mut Player
 }
 
 fn draw_mouse(window: &Window, terminal: &Terminal, mouse: &Mouse, buffer: &mut CellBuffer) {
-    let position = mouse.get_client_position();
-    let char_size = terminal.get_char_size(window);
+    let position = mouse.get_client_position().unwrap();
+    let char_size = terminal.get_char_size(window).unwrap();
     let cursor = Cell::new('▓', Color::White, Color::Black);
 
     if char_size.is_empty() {

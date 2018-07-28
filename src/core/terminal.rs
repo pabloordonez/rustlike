@@ -5,23 +5,23 @@ use core::window::Window;
 
 pub trait Terminal {
     /// Disposes the terminal object-
-    fn dispose(&self);
+    fn dispose(&self) -> Result<(), &'static str>;
 
     /// Shows or hides the cursor.
-    fn set_cursor_visibility(&self, visible: bool);
+    fn set_cursor_visibility(&self, visible: bool) -> Result<(), &'static str>;
 
     /// Moves the console cursor to a given position.
-    fn set_cursor(&self, positon: Point2d);
+    fn set_cursor(&self, positon: Point2d) -> Result<(), &'static str>;
 
     /// Gets the current console size in character units.
-    fn get_console_size(&self) -> Size2d;
+    fn get_console_size(&self) -> Result<Size2d, &'static str>;
 
     /// Gets the character size in pixel units.
-    fn get_char_size(&self, window: &Window) -> Size2d;
+    fn get_char_size(&self, window: &Window) -> Result<Size2d, &'static str>;
 
     /// Clears the console screen.
-    fn clear(&self);
+    fn clear(&self) -> Result<(), &'static str>;
 
     /// Draws a `CellBuffer` to the screen.
-    fn write(&self, cell_buffer: &CellBuffer);
+    fn write(&self, cell_buffer: &CellBuffer) -> Result<(), &'static str>;
 }
