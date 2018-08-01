@@ -1,27 +1,21 @@
 use core::color::Color;
 
-#[derive(Debug, Copy, Clone)]
-pub struct Cell {
-    pub character: char,
-    pub background: Color,
-    pub foreground: Color,
-}
+pub trait Cell {
+    // Sets the cell character.
+    fn set_char(&self, character: char);
 
-#[allow(dead_code)]
-impl Cell {
-    pub fn new(character: char, foreground: Color, background: Color) -> Cell {
-        Cell {
-            character,
-            background,
-            foreground,
-        }
-    }
+    // Sets the cell colors.
+    fn set_colors(foreground: Color, background: Color);
 
-    pub fn new_default(character: char) -> Cell {
-        Cell {
-            character,
-            background: Color::Black,
-            foreground: Color::Grey,
-        }
-    }
+    // sets the background color.
+    fn set_bg_color(&self, color: Color);
+
+    // Sets the foreground color.
+    fn set_fg_color(&self, color: Color);
+
+    // Gets the background color.
+    fn get_bg_color(&self) -> Color;
+
+    // Gets the foreground color.
+    fn get_fg_color(&self) -> Color;
 }

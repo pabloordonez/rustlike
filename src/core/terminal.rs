@@ -1,9 +1,16 @@
+use core::cell::Cell;
 use core::cell_buffer::CellBuffer;
 use core::point_2d::Point2d;
 use core::size_2d::Size2d;
 use core::window::Window;
 
-pub trait Terminal {
+pub trait Terminal<TCell>
+where
+    TCell: Cell,
+{
+    // Creates a new cell buffer.
+    fn create_buffer(size: Size2d) -> CellBuffer<TCell>;
+
     /// Disposes the terminal object-
     fn dispose(&self) -> Result<(), &'static str>;
 
@@ -23,5 +30,5 @@ pub trait Terminal {
     fn clear(&self) -> Result<(), &'static str>;
 
     /// Draws a `CellBuffer` to the screen.
-    fn write(&self, cell_buffer: &CellBuffer) -> Result<(), &'static str>;
+    fn write(&self, cell_buffer: &CellBuffer<TCell>) -> Result<(), &'static str>;
 }
