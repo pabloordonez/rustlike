@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="054d7ace-e97c-4c52-a815-f6035a112ebe" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/windows/cell.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/windows/cell.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/windows/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/windows/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/windows/terminal.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/windows/terminal.rs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -13,20 +15,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.rs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="530">
-              <caret line="107" selection-start-line="107" selection-end-line="107" />
+            <state relative-caret-position="241">
+              <caret line="120" selection-start-line="120" selection-end-line="120" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="terminal.rs" pinned="false" current-in-tab="false">
+      <file leaf-file-name="terminal.rs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/windows/terminal.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1003">
-              <caret line="61" selection-start-line="61" selection-end-line="61" />
+            <state relative-caret-position="485">
+              <caret line="34" column="20" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
             </state>
           </provider>
         </entry>
@@ -34,14 +36,8 @@
       <file leaf-file-name="mod.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/windows/mod.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
-              <folding>
-                <element signature="e#344#345#0" expanded="true" />
-                <element signature="e#379#380#0" expanded="true" />
-                <element signature="e#431#432#0" expanded="true" />
-                <element signature="e#466#467#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="17">
+              <caret line="23" column="1" selection-start-line="23" selection-end-line="23" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -49,8 +45,8 @@
       <file leaf-file-name="mouse.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/windows/mouse.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="782">
-              <caret line="46" selection-start-line="46" selection-end-line="46" />
+            <state relative-caret-position="411">
+              <caret line="51" selection-start-line="51" selection-end-line="51" />
             </state>
           </provider>
         </entry>
@@ -79,9 +75,9 @@
         <option value="$PROJECT_DIR$/src/core/terminal.rs" />
         <option value="$PROJECT_DIR$/src/windows/mod.rs" />
         <option value="$PROJECT_DIR$/src/core/mouse.rs" />
-        <option value="$PROJECT_DIR$/src/windows/terminal.rs" />
         <option value="$PROJECT_DIR$/src/windows/mouse.rs" />
         <option value="$PROJECT_DIR$/src/main.rs" />
+        <option value="$PROJECT_DIR$/src/windows/terminal.rs" />
       </list>
     </option>
   </component>
@@ -219,6 +215,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32897604" />
       <window_info anchor="right" id="Cargo" order="3" weight="0.3296875" />
@@ -229,7 +226,7 @@
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.62366736" weight="0.33769062" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49946696" weight="0.32897604" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11513859" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.116204694" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -503,37 +500,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/windows/terminal.rs">
+    <entry file="file://$PROJECT_DIR$/src/main.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1003">
-          <caret line="61" selection-start-line="61" selection-end-line="61" />
+        <state relative-caret-position="241">
+          <caret line="120" selection-start-line="120" selection-end-line="120" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/windows/mod.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
-          <folding>
-            <element signature="e#344#345#0" expanded="true" />
-            <element signature="e#379#380#0" expanded="true" />
-            <element signature="e#431#432#0" expanded="true" />
-            <element signature="e#466#467#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="17">
+          <caret line="23" column="1" selection-start-line="23" selection-end-line="23" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/windows/mouse.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="782">
-          <caret line="46" selection-start-line="46" selection-end-line="46" />
+        <state relative-caret-position="411">
+          <caret line="51" selection-start-line="51" selection-end-line="51" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.rs">
+    <entry file="file://$PROJECT_DIR$/src/windows/terminal.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="530">
-          <caret line="107" selection-start-line="107" selection-end-line="107" />
+        <state relative-caret-position="485">
+          <caret line="34" column="20" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
         </state>
       </provider>
     </entry>

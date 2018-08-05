@@ -2,10 +2,14 @@ extern crate winapi;
 
 use windows::winapi::shared::windef::{POINT, RECT};
 use windows::winapi::um::wincon::{
-    CONSOLE_CURSOR_INFO, CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
+    CHAR_INFO, CONSOLE_CURSOR_INFO, CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
 };
 
-use super::core::color::Color;
+use std::mem::zeroed;
+
+pub mod cell;
+
+pub mod cell_buffer;
 
 pub mod window;
 
@@ -15,6 +19,12 @@ pub mod mouse;
 
 pub trait Empty {
     fn empty() -> Self;
+}
+
+impl Empty for CHAR_INFO {
+    fn empty() -> CHAR_INFO {
+        unsafe { zeroed::<CHAR_INFO>() }
+    }
 }
 
 impl Empty for POINT {

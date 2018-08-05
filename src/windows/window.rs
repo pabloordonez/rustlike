@@ -22,7 +22,7 @@ impl WindowsWindow {
 
 #[allow(dead_code)]
 impl Window for WindowsWindow {
-    fn get_window_size(&self) ->  Result<Size2d, &'static str> {
+    fn get_window_size(&self) -> Result<Size2d, &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
@@ -36,7 +36,7 @@ impl Window for WindowsWindow {
         ))
     }
 
-    fn get_window_client_size(&self) ->  Result<Size2d, &'static str> {
+    fn get_window_client_size(&self) -> Result<Size2d, &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetClientRect(self.window_handle, &mut rect) };
 
@@ -88,7 +88,7 @@ impl Window for WindowsWindow {
         Ok(Point2d::new(rect.left as usize, rect.top as usize))
     }
 
-    fn set_window_position(&self, position: Point2d)  -> Result<(), &'static str> {
+    fn set_window_position(&self, position: Point2d) -> Result<(), &'static str> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 

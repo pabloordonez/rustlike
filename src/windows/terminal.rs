@@ -15,13 +15,15 @@ use windows::winapi::um::winnt::HANDLE;
 use std::mem::zeroed;
 use std::ptr::null_mut;
 
-use super::super::core::cell::Cell;
-use super::super::core::cell_buffer::CellBuffer;
-use super::super::core::point_2d::Point2d;
-use super::super::core::size_2d::Size2d;
-use super::super::core::terminal::Terminal;
-use super::super::core::window::Window;
-use super::{get_background_color, get_foreground_color, get_wstring, Empty};
+use core::cell::Cell;
+use core::cell_buffer::CellBuffer;
+use core::point_2d::Point2d;
+use core::size_2d::Size2d;
+use core::terminal::Terminal;
+use core::window::cell_buffer::WindowsCellBuffer;
+use core::window::Window;
+
+use super::{get_wstring, Empty};
 
 #[derive(Debug)]
 pub struct WindowsTerminal {
@@ -52,6 +54,10 @@ impl WindowsTerminal {
 
 #[allow(dead_code)]
 impl Terminal for WindowsTerminal {
+    fn create_buffer(size: Size2d) -> &CellBuffer {
+        return WindowsCellBuffer::new(CHAR_INFO::empty(), size);
+    }
+
     fn dispose(&self) -> Result<(), &'static str> {
         unsafe { CloseHandle(self.console_handle) };
         Ok(())
@@ -168,17 +174,6 @@ impl Terminal for WindowsTerminal {
     }
 
     fn write(&self, cell_buffer: &CellBuffer) -> Result<(), &'static str> {
-        let char_info_array = cell_buffer
-            .iter()
-            .map(|cell: &Cell| unsafe {
-                let mut char_info: CHAR_INFO = zeroed();
-                char_info.Attributes =
-                    get_foreground_color(cell.foreground) | get_background_color(cell.background);
-                *char_info.Char.UnicodeChar_mut() = cell.character as u16;
-                char_info
-            })
-            .collect::<Vec<CHAR_INFO>>();
-
         let mut rect = SMALL_RECT {
             Left: 0,
             Top: 0,
@@ -189,7 +184,7 @@ impl Terminal for WindowsTerminal {
         let success = unsafe {
             WriteConsoleOutputW(
                 self.console_handle,
-                char_info_array.as_ptr(),
+                cell_buffer.get_cells().as_ptr(),
                 COORD {
                     X: cell_buffer.size.width as i16,
                     Y: cell_buffer.size.height as i16,
