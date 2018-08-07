@@ -1,5 +1,4 @@
 extern crate winapi;
-use windows::winapi::um::winbase::STD_INPUT_HANDLE;
 use core::cell::Cell;
 use core::cell_buffer::CellBuffer;
 use core::point_2d::Point2d;
@@ -14,6 +13,7 @@ use windows::winapi::shared::windef::HWND;
 use windows::winapi::um::fileapi::CreateFileW;
 use windows::winapi::um::handleapi::CloseHandle;
 use windows::winapi::um::processenv::GetStdHandle;
+use windows::winapi::um::winbase::STD_INPUT_HANDLE;
 use windows::winapi::um::winbase::STD_OUTPUT_HANDLE;
 use windows::winapi::um::wincon::{
     GetConsoleCursorInfo, GetConsoleScreenBufferInfo, GetConsoleWindow, SetConsoleCursorInfo,
@@ -142,7 +142,7 @@ impl Terminal for WindowsTerminal {
         let console_size = self.get_console_size()?;
         let client_size = window.get_window_client_size()?;
 
-        if console_size.is_empty() {
+        if console_size.width == 0 || console_size.height == 0 {
             return Ok(Size2d::empty());
         }
 

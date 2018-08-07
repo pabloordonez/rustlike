@@ -6,15 +6,14 @@ use core::events::event::{
 use core::events::event_queue::EventQueue;
 use core::mouse::Mouse;
 use core::point_2d::Point2d;
-use core::size_2d::Size2d;
 use core::terminal::Terminal;
 use core::window::Window;
 use core::Result;
 use std::char::from_u32;
 use windows::mouse::WindowsMouse;
 use windows::terminal::WindowsTerminal;
-use windows::winapi::um::consoleapi::{GetNumberOfConsoleInputEvents, ReadConsoleInputW};
-use windows::winapi::um::wincon::{FOCUS_EVENT, INPUT_RECORD, KEY_EVENT, MOUSE_EVENT};
+use windows::winapi::um::consoleapi::{GetNumberOfConsoleInputEvents, ReadConsoleInputW, SetConsoleMode};
+use windows::winapi::um::wincon::{FOCUS_EVENT, INPUT_RECORD, KEY_EVENT, MOUSE_EVENT, ENABLE_WINDOW_INPUT, ENABLE_MOUSE_INPUT};
 use windows::window::WindowsWindow;
 use windows::Empty;
 
@@ -29,12 +28,23 @@ pub struct WindowsApplication {
 #[allow(dead_code)]
 impl WindowsApplication {
     pub fn create() -> Result<WindowsApplication> {
-        Ok(WindowsApplication {
+
+        let application = WindowsApplication {
             window: WindowsWindow::new(),
             terminal: WindowsTerminal::create()?,
             mouse: WindowsMouse::new(),
             event_queue: EventQueue::new(),
-        })
+        };
+
+        let success = unsafe {
+            SetConsoleMode(application.terminal.input_handle, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT)
+        };
+
+        if success == -1 {
+            return Err("Couldn't set the console mode.");
+        }
+
+        Ok(application)
     }
 }
 

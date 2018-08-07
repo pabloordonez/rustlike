@@ -91,7 +91,19 @@ fn draw_player(application: &Application, buffer: &mut CellBuffer, player: &mut 
 }
 
 fn draw_mouse(application: &Application, buffer: &mut CellBuffer) {
+    let window_position = application.get_window().get_window_position().unwrap();
+    let window_size = application.get_window().get_window_size().unwrap();
     let position = application.get_mouse().get_client_position().unwrap();
+
+    if position.x < window_position.x
+        || position.y < window_position.y
+        || position.x > window_position.x + window_size.width
+        || position.y > window_position.y + window_size.height
+    {
+        return;
+    }
+
+    let console_size = application.get_terminal().get_console_size().unwrap();
     let char_size = application
         .get_terminal()
         .get_char_size(application.get_window())
@@ -102,10 +114,18 @@ fn draw_mouse(application: &Application, buffer: &mut CellBuffer) {
         return;
     }
 
-    buffer.set(
-        Point2d::new(position.x / char_size.width, position.y / char_size.height),
-        cursor,
-    );
+    let char_position = Point2d::new(position.x / char_size.width, position.y / char_size.height);
+
+    if char_position.x >= console_size.width || char_position.y >= console_size.height {
+        return;
+    }
+
+    application
+        .get_terminal()
+        .set_cursor(char_position)
+        .unwrap();
+
+    buffer.set(char_position, cursor);
 }
 
 fn main() -> Result<()> {
@@ -122,7 +142,7 @@ fn main() -> Result<()> {
         let terminal = application.get_terminal();
         terminal.clear()?;
         terminal.set_cursor(Point2d::empty())?;
-        terminal.set_cursor_visibility(false)?;
+        terminal.set_cursor_visibility(true)?;
     }
 
     let mut buffer = CellBuffer::new(Cell::new(' ', Color::Black, Color::Green), Size2d::empty());
@@ -148,7 +168,12 @@ fn main() -> Result<()> {
         let mut i = 0;
 
         while let Some(event) = application.get_mut_event_queue().get_event() {
-            buffer.write_string(&format!("{:?}", event), Point2d::new(0, 2 + i), Color::White, Color::Black);
+            buffer.write_string(
+                &format!("{:?}", event),
+                Point2d::new(0, 2 + i),
+                Color::White,
+                Color::Black,
+            );
             i = i + 1;
         }
 
