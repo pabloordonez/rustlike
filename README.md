@@ -1,6 +1,7 @@
 # rustlike
 A roguelike engine in rust.
 
+## Introduction
 At least for now the terminal is being implemented for windows using winapi to increase the
 draw speed. Writing directly to the console is much much faster than using the std out rust
 provides.
@@ -10,3 +11,8 @@ construct over the drawing engine a app and games simple frameworks. It should a
 simple UIs and games with it.
 
 ![current screen](current_screen.png)
+
+
+## Event Handling
+On windows terminal, if the option Quick Edit Mode is enabled, the console won't report mouse
+event back to the application.
