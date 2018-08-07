@@ -1,4 +1,13 @@
 extern crate winapi;
+use windows::winapi::um::winbase::STD_INPUT_HANDLE;
+use core::cell::Cell;
+use core::cell_buffer::CellBuffer;
+use core::point_2d::Point2d;
+use core::size_2d::Size2d;
+use core::terminal::Terminal;
+use core::window::Window;
+use core::Result;
+use std::ptr::null_mut;
 use windows::color::get_u16_from_color;
 use windows::winapi::ctypes::c_void;
 use windows::winapi::shared::windef::HWND;
@@ -12,23 +21,13 @@ use windows::winapi::um::wincon::{
     CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
 };
 use windows::winapi::um::winnt::HANDLE;
-
-use std::mem::zeroed;
-use std::ptr::null_mut;
-
-use core::cell::Cell;
-use core::cell_buffer::CellBuffer;
-use core::point_2d::Point2d;
-use core::size_2d::Size2d;
-use core::terminal::Terminal;
-use core::window::Window;
-use core::Result;
 use windows::{get_wstring, Empty};
 
 #[derive(Debug)]
 pub struct WindowsTerminal {
     pub console_handle: *mut c_void,
     pub output_handle: HANDLE,
+    pub input_handle: HANDLE,
     pub window_handle: HWND,
 }
 
@@ -56,6 +55,12 @@ impl WindowsTerminal {
             return Err("Couldn't retrieve the output handle.");
         }
 
+        let input_handle = unsafe { GetStdHandle(STD_INPUT_HANDLE) };
+
+        if output_handle == null_mut() {
+            return Err("Couldn't retrieve the input handle.");
+        }
+
         let window_handle = unsafe { GetConsoleWindow() };
 
         if window_handle == null_mut() {
@@ -65,6 +70,7 @@ impl WindowsTerminal {
         Ok(WindowsTerminal {
             console_handle,
             output_handle,
+            input_handle,
             window_handle,
         })
     }
@@ -150,11 +156,9 @@ impl Terminal for WindowsTerminal {
         let size = self.get_console_size()?;
         let width = size.width as i16;
         let height = size.height as i16;
-        let mut char_info: CHAR_INFO;
+        let mut char_info = CHAR_INFO::empty();
 
         unsafe {
-            char_info = zeroed();
-            char_info.Attributes = 0;
             *char_info.Char.UnicodeChar_mut() = ' ' as u16;
         }
 
@@ -193,11 +197,13 @@ impl Terminal for WindowsTerminal {
         //       and let the representation be updated when needed.
         let char_info_array = cell_buffer
             .iter()
-            .map(|cell: &Cell| unsafe {
-                let mut char_info: CHAR_INFO = zeroed();
+            .map(|cell: &Cell| {
+                let mut char_info = CHAR_INFO::empty();
                 char_info.Attributes = get_u16_from_color(cell.foreground)
                     | (get_u16_from_color(cell.background) << 4);
-                *char_info.Char.UnicodeChar_mut() = cell.character as u16;
+                unsafe {
+                    *char_info.Char.UnicodeChar_mut() = cell.character as u16;
+                }
                 char_info
             })
             .collect::<Vec<CHAR_INFO>>();

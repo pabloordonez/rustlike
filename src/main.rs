@@ -2,19 +2,14 @@ use std::time::{Duration, Instant};
 
 mod core;
 mod windows;
+use core::application::Application;
 use core::cell::Cell;
 use core::cell_buffer::CellBuffer;
 use core::color::Color;
-use core::mouse::Mouse;
 use core::point_2d::Point2d;
 use core::size_2d::Size2d;
-use core::terminal::Terminal;
-use core::window::Window;
 use core::Result;
-use std::boxed::Box;
-use windows::mouse::WindowsMouse;
-use windows::terminal::WindowsTerminal;
-use windows::window::WindowsWindow;
+use windows::application::WindowsApplication;
 
 struct Player {
     ox: f32,
@@ -23,21 +18,24 @@ struct Player {
     ny: f32,
 }
 
-fn check_size(terminal: &Terminal, buffer: &mut CellBuffer) {
-    let size = terminal.get_console_size().unwrap();
+fn check_size(application: &Application, buffer: &mut CellBuffer) {
+    let size = application.get_terminal().get_console_size().unwrap();
 
     if size.width != buffer.size.width || size.height != buffer.size.height {
         buffer.resize(Cell::new(' ', Color::Black, Color::Green), size);
     }
 }
 
-fn draw_stats(window: &Window, terminal: &Terminal, buffer: &mut CellBuffer, fps: i32) {
+fn draw_stats(application: &Application, buffer: &mut CellBuffer, fps: i32) {
     let text_background = Cell::new(' ', Color::White, Color::DarkGreen);
     let separator = Cell::new('=', Color::White, Color::DarkGreen);
     let square = CellBuffer::new(
         Cell::new('#', Color::Grey, Color::DarkGreen),
         Size2d::new(5, 5),
     );
+
+    let window = application.get_window();
+    let terminal = application.get_terminal();
 
     let console_size = terminal.get_console_size().unwrap();
     let window_size = window.get_window_client_size().unwrap();
@@ -63,8 +61,8 @@ fn draw_stats(window: &Window, terminal: &Terminal, buffer: &mut CellBuffer, fps
     );
 }
 
-fn draw_player(terminal: &Terminal, buffer: &mut CellBuffer, player: &mut Player) {
-    let console_size = terminal.get_console_size().unwrap();
+fn draw_player(application: &Application, buffer: &mut CellBuffer, player: &mut Player) {
+    let console_size = application.get_terminal().get_console_size().unwrap();
     let player_cell = Cell::new('@', Color::Green, Color::Blue);
     let background_cell = Cell::new(' ', Color::Black, Color::Green);
 
@@ -76,7 +74,7 @@ fn draw_player(terminal: &Terminal, buffer: &mut CellBuffer, player: &mut Player
     }
 
     if player.ny as usize == console_size.height {
-        player.ny = 2.0;
+        player.ny = 3.0;
     }
 
     buffer.set(
@@ -92,9 +90,12 @@ fn draw_player(terminal: &Terminal, buffer: &mut CellBuffer, player: &mut Player
     player.oy = player.ny;
 }
 
-fn draw_mouse(window: &Window, terminal: &Terminal, mouse: &Mouse, buffer: &mut CellBuffer) {
-    let position = mouse.get_client_position().unwrap();
-    let char_size = terminal.get_char_size(window).unwrap();
+fn draw_mouse(application: &Application, buffer: &mut CellBuffer) {
+    let position = application.get_mouse().get_client_position().unwrap();
+    let char_size = application
+        .get_terminal()
+        .get_char_size(application.get_window())
+        .unwrap();
     let cursor = Cell::new('▓', Color::White, Color::Black);
 
     if char_size.is_empty() {
@@ -108,17 +109,21 @@ fn draw_mouse(window: &Window, terminal: &Terminal, mouse: &Mouse, buffer: &mut 
 }
 
 fn main() -> Result<()> {
-    let window = Box::new(WindowsWindow::new());
-    window.set_window_position(Point2d::empty())?;
-    window.set_window_size(Size2d::new(800, 600))?;
+    let mut application = WindowsApplication::create()?;
 
-    let mouse = Box::new(WindowsMouse::new());
-    mouse.show_cursor(false)?;
+    {
+        let window = application.get_window();
+        window.set_window_position(Point2d::empty())?;
+        window.set_window_size(Size2d::new(800, 600))?;
 
-    let terminal = Box::new(WindowsTerminal::create()?);
-    terminal.clear()?;
-    terminal.set_cursor(Point2d::empty())?;
-    terminal.set_cursor_visibility(false)?;
+        let mouse = application.get_mouse();
+        mouse.show_cursor(false)?;
+
+        let terminal = application.get_terminal();
+        terminal.clear()?;
+        terminal.set_cursor(Point2d::empty())?;
+        terminal.set_cursor_visibility(false)?;
+    }
 
     let mut buffer = CellBuffer::new(Cell::new(' ', Color::Black, Color::Green), Size2d::empty());
 
@@ -130,7 +135,7 @@ fn main() -> Result<()> {
         ox: 0.0,
         oy: 0.0,
         nx: 0.0,
-        ny: 2.0,
+        ny: 3.0,
     };
 
     loop {
@@ -138,25 +143,29 @@ fn main() -> Result<()> {
 
         frames += 1;
 
+        application.listen_events()?;
+
+        let mut i = 0;
+
+        while let Some(event) = application.get_mut_event_queue().get_event() {
+            buffer.write_string(&format!("{:?}", event), Point2d::new(0, 2 + i), Color::White, Color::Black);
+            i = i + 1;
+        }
+
         // checks the size and resize the buffer if required.
-        check_size(terminal.as_ref(), &mut buffer);
+        check_size(&application, &mut buffer);
 
         // checks the app stats and draw them in the stat bar.
-        draw_stats(window.as_ref(), terminal.as_ref(), &mut buffer, fps);
+        draw_stats(&application, &mut buffer, fps);
 
         // draws the moving player.
-        draw_player(terminal.as_ref(), &mut buffer, &mut player);
+        draw_player(&application, &mut buffer, &mut player);
 
         // draws the mouse cursor.
-        draw_mouse(
-            window.as_ref(),
-            terminal.as_ref(),
-            mouse.as_ref(),
-            &mut buffer,
-        );
+        draw_mouse(&application, &mut buffer);
 
         // blits the buffer onto the terminal console.
-        terminal.write(&buffer)?;
+        application.get_terminal().write(&buffer)?;
 
         // checks the frames.
         duration += now.elapsed();
@@ -168,5 +177,5 @@ fn main() -> Result<()> {
         }
     }
 
-    terminal.dispose()?;
+    //application.get_terminal().dispose()?;
 }

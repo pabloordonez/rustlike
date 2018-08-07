@@ -2,7 +2,7 @@ use core::events::event::Event;
 use std::collections::vec_deque::VecDeque;
 
 #[allow(dead_code)]
-struct EventQueue {
+pub struct EventQueue {
     queue: VecDeque<Event>,
     events: usize
 }

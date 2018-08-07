@@ -11,3 +11,4 @@ pub mod size_2d;
 pub mod terminal;
 pub mod window;
 pub mod events;
+pub mod application;

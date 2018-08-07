@@ -1,17 +1,17 @@
 extern crate winapi;
-
+use std::mem::zeroed;
+use windows::winapi::um::wincon::CHAR_INFO;
+use windows::winapi::um::wincon::INPUT_RECORD;
 use windows::winapi::shared::windef::{POINT, RECT};
 use windows::winapi::um::wincon::{
     CONSOLE_CURSOR_INFO, CONSOLE_SCREEN_BUFFER_INFO, COORD, SMALL_RECT,
 };
 
 pub mod color;
-
 pub mod window;
-
 pub mod terminal;
-
 pub mod mouse;
+pub mod application;
 
 pub trait Empty {
     fn empty() -> Self;
@@ -69,6 +69,18 @@ impl Empty for CONSOLE_CURSOR_INFO {
             dwSize: 0,
             bVisible: 0,
         }
+    }
+}
+
+impl Empty for CHAR_INFO {
+    fn empty() -> CHAR_INFO {
+        unsafe { zeroed::<CHAR_INFO>() }
+    }
+}
+
+impl Empty for INPUT_RECORD {
+    fn empty() -> INPUT_RECORD {
+        unsafe { zeroed::<INPUT_RECORD>() }
     }
 }
 
