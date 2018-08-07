@@ -1,13 +1,14 @@
 extern crate winapi;
-use super::super::core::mouse::Mouse;
-use super::super::core::point_2d::Point2d;
-use super::Empty;
+use core::mouse::Mouse;
+use core::point_2d::Point2d;
+use core::Result;
 use std::ptr::null_mut;
 use windows::winapi::shared::windef::{HWND, POINT};
 use windows::winapi::um::wincon::GetConsoleWindow;
 use windows::winapi::um::winuser::{
     GetCursorPos, LoadCursorW, ScreenToClient, SetCursor, SetCursorPos, IDC_ARROW,
 };
+use windows::Empty;
 
 #[derive(Debug)]
 pub struct WindowsMouse {
@@ -23,7 +24,7 @@ impl WindowsMouse {
 }
 
 impl Mouse for WindowsMouse {
-    fn get_absolute_position(&self) -> Result<Point2d, &'static str> {
+    fn get_absolute_position(&self) -> Result<Point2d> {
         let mut point = POINT::empty();
         let success = unsafe { GetCursorPos(&mut point) };
 
@@ -34,7 +35,7 @@ impl Mouse for WindowsMouse {
         Ok(Point2d::new(point.x as usize, point.y as usize))
     }
 
-    fn get_client_position(&self) -> Result<Point2d, &'static str> {
+    fn get_client_position(&self) -> Result<Point2d> {
         let position = self.get_absolute_position()?;
         let mut point = POINT {
             x: position.x as i32,
@@ -50,7 +51,7 @@ impl Mouse for WindowsMouse {
         Ok(Point2d::new(point.x as usize, point.y as usize))
     }
 
-    fn set_position(&self, position: Point2d) -> Result<(), &'static str> {
+    fn set_position(&self, position: Point2d) -> Result<()> {
         let success = unsafe { SetCursorPos(position.x as i32, position.y as i32) };
 
         if success == 0 {
@@ -60,7 +61,7 @@ impl Mouse for WindowsMouse {
         Ok(())
     }
 
-    fn show_cursor(&self, visible: bool) -> Result<(), &'static str> {
+    fn show_cursor(&self, visible: bool) -> Result<()> {
         if visible {
             unsafe { SetCursor(LoadCursorW(null_mut(), IDC_ARROW)) }
         } else {

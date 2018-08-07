@@ -1,11 +1,12 @@
 extern crate winapi;
-use super::super::core::point_2d::Point2d;
-use super::super::core::size_2d::Size2d;
-use super::super::core::window::Window;
-use super::Empty;
+use core::point_2d::Point2d;
+use core::size_2d::Size2d;
+use core::window::Window;
+use core::Result;
 use windows::winapi::shared::windef::{HWND, RECT};
 use windows::winapi::um::wincon::GetConsoleWindow;
 use windows::winapi::um::winuser::{GetClientRect, GetWindowRect, SetWindowPos};
+use windows::Empty;
 
 #[derive(Debug)]
 pub struct WindowsWindow {
@@ -22,7 +23,7 @@ impl WindowsWindow {
 
 #[allow(dead_code)]
 impl Window for WindowsWindow {
-    fn get_window_size(&self) ->  Result<Size2d, &'static str> {
+    fn get_window_size(&self) -> Result<Size2d> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
@@ -36,7 +37,7 @@ impl Window for WindowsWindow {
         ))
     }
 
-    fn get_window_client_size(&self) ->  Result<Size2d, &'static str> {
+    fn get_window_client_size(&self) -> Result<Size2d> {
         let mut rect = RECT::empty();
         let success = unsafe { GetClientRect(self.window_handle, &mut rect) };
 
@@ -50,7 +51,7 @@ impl Window for WindowsWindow {
         ))
     }
 
-    fn set_window_size(&self, size: Size2d) -> Result<(), &'static str> {
+    fn set_window_size(&self, size: Size2d) -> Result<()> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
@@ -77,7 +78,7 @@ impl Window for WindowsWindow {
         Ok(())
     }
 
-    fn get_window_position(&self) -> Result<Point2d, &'static str> {
+    fn get_window_position(&self) -> Result<Point2d> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 
@@ -88,7 +89,7 @@ impl Window for WindowsWindow {
         Ok(Point2d::new(rect.left as usize, rect.top as usize))
     }
 
-    fn set_window_position(&self, position: Point2d)  -> Result<(), &'static str> {
+    fn set_window_position(&self, position: Point2d) -> Result<()> {
         let mut rect = RECT::empty();
         let success = unsafe { GetWindowRect(self.window_handle, &mut rect) };
 

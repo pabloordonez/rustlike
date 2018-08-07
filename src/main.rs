@@ -10,6 +10,7 @@ use core::point_2d::Point2d;
 use core::size_2d::Size2d;
 use core::terminal::Terminal;
 use core::window::Window;
+use core::Result;
 use std::boxed::Box;
 use windows::mouse::WindowsMouse;
 use windows::terminal::WindowsTerminal;
@@ -106,18 +107,18 @@ fn draw_mouse(window: &Window, terminal: &Terminal, mouse: &Mouse, buffer: &mut 
     );
 }
 
-fn main() {
+fn main() -> Result<()> {
     let window = Box::new(WindowsWindow::new());
-    window.set_window_position(Point2d::empty());
-    window.set_window_size(Size2d::new(800, 600));
+    window.set_window_position(Point2d::empty())?;
+    window.set_window_size(Size2d::new(800, 600))?;
 
     let mouse = Box::new(WindowsMouse::new());
-    mouse.show_cursor(false);
+    mouse.show_cursor(false)?;
 
-    let terminal = Box::new(WindowsTerminal::new());
-    terminal.clear();
-    terminal.set_cursor(Point2d::empty());
-    terminal.set_cursor_visibility(false);
+    let terminal = Box::new(WindowsTerminal::create()?);
+    terminal.clear()?;
+    terminal.set_cursor(Point2d::empty())?;
+    terminal.set_cursor_visibility(false)?;
 
     let mut buffer = CellBuffer::new(Cell::new(' ', Color::Black, Color::Green), Size2d::empty());
 
@@ -155,7 +156,7 @@ fn main() {
         );
 
         // blits the buffer onto the terminal console.
-        terminal.write(&buffer);
+        terminal.write(&buffer)?;
 
         // checks the frames.
         duration += now.elapsed();
@@ -167,5 +168,5 @@ fn main() {
         }
     }
 
-    terminal.dispose();
+    terminal.dispose()?;
 }
