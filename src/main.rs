@@ -1,5 +1,5 @@
-use core::mouse::is_right_button_pressed;
-use core::mouse::is_left_button_pressed;
+use core::events::event::KeyboardEvent;
+use core::events::event::MouseEvent;
 use std::time::{Duration, Instant};
 
 mod core;
@@ -8,12 +8,11 @@ use core::application::Application;
 use core::cell::Cell;
 use core::cell_buffer::CellBuffer;
 use core::color::Color;
-use core::events::event::{Event, MouseEventType};
+use core::events::event::{Event, KeyboardEventType, MouseEventType};
 use core::point_2d::Point2d;
 use core::size_2d::Size2d;
 use core::Result;
 use windows::application::WindowsApplication;
-
 
 fn main() -> Result<()> {
     let mut application = WindowsApplication::create()?;
@@ -47,17 +46,8 @@ fn main() -> Result<()> {
         // while there is events in the event queue, process them.
         while let Some(event) = application.get_mut_event_queue().get_event() {
             match event {
-                Event::Mouse(mouse) => {
-                    if mouse.event_type == MouseEventType::MouseMove {
-                        if is_left_button_pressed(mouse.buttons) {
-                            buffer.set(mouse.position, Cell::new('░', Color::White, Color::Black));
-                        }
-
-                        if is_right_button_pressed(mouse.buttons) {
-                            buffer.set(mouse.position, Cell::new_default(' '));
-                        }
-                    }
-                }
+                Event::Mouse(mouse) => process_mouse_events(mouse, &mut buffer),
+                Event::Keyboard(keyboard) => process_keyboard_events(keyboard, &mut buffer),
                 _ => continue,
             };
         }
@@ -122,4 +112,106 @@ fn draw_stats(application: &Application, buffer: &mut CellBuffer, fps: i32) -> R
     );
 
     Ok(())
+}
+
+fn process_mouse_events(mouse: MouseEvent, buffer: &mut CellBuffer) {
+    if mouse.event_type == MouseEventType::MouseMove || mouse.event_type == MouseEventType::Click {
+        if mouse.left_button {
+            buffer.set(mouse.position, Cell::new('░', Color::White, Color::Black));
+        }
+
+        if mouse.right_button {
+            buffer.set(mouse.position, Cell::new_default(' '));
+        }
+    }
+
+    if mouse.event_type == MouseEventType::HorizontalWheel {
+        buffer.write_string(
+            &format!("{}", mouse.wheel_delta),
+            Point2d::new(0, 2),
+            Color::White,
+            Color::DarkBlue,
+        );
+    }
+}
+
+fn process_keyboard_events(keyboard: KeyboardEvent, buffer: &mut CellBuffer) {
+    let down = if keyboard.event_type == KeyboardEventType::KeyDown {
+        "down"
+    } else {
+        "up"
+    };
+
+    buffer.write_string(
+        &format!("{} {}", keyboard.character, down),
+        Point2d::new(0, 2),
+        Color::White,
+        Color::DarkBlue,
+    );
+
+    buffer.write_str(
+        if keyboard.left_shift {
+            "left shift down"
+        } else {
+            "left shift up  "
+        },
+        Point2d::new(0, 3),
+        Color::White,
+        Color::DarkBlue,
+    );
+
+    buffer.write_str(
+        if keyboard.left_alt {
+            "left alt down"
+        } else {
+            "left alt up  "
+        },
+        Point2d::new(0, 4),
+        Color::White,
+        Color::DarkBlue,
+    );
+
+    buffer.write_str(
+        if keyboard.left_control {
+            "left control down"
+        } else {
+            "left control up  "
+        },
+        Point2d::new(0, 5),
+        Color::White,
+        Color::DarkBlue,
+    );
+
+    buffer.write_str(
+        if keyboard.right_shift {
+            "right shift down"
+        } else {
+            "right shift up  "
+        },
+        Point2d::new(20, 3),
+        Color::White,
+        Color::DarkBlue,
+    );
+
+    buffer.write_str(
+        if keyboard.right_alt {
+            "right alt down"
+        } else {
+            "right alt up  "
+        },
+        Point2d::new(20, 4),
+        Color::White,
+        Color::DarkBlue,
+    );
+
+    buffer.write_str(
+        if keyboard.right_control {
+            "right control down"
+        } else {
+            "right control up  "
+        },
+        Point2d::new(20, 5),
+        Color::White,
+        Color::DarkBlue,
+    );
 }

@@ -1,5 +1,5 @@
-use core::size_2d::Size2d;
 use core::point_2d::Point2d;
+use core::size_2d::Size2d;
 
 /// Enumerates all the possible mouse event types.
 #[allow(dead_code)]
@@ -17,8 +17,7 @@ pub enum MouseEventType {
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum KeyboardEventType {
     KeyDown,
-    KeyUp,
-    KeyPress
+    KeyUp
 }
 
 /// Enumerates all the possible window event types.
@@ -29,7 +28,7 @@ pub enum WindowEventType {
     WindowResize,
     WindowFocus,
     WindowLostFocus,
-    WindowClose
+    WindowClose,
 }
 
 /// Represents a mouse event like mouse move or mouse down.
@@ -37,10 +36,16 @@ pub enum WindowEventType {
 #[derive(Debug, Copy, Clone)]
 pub struct MouseEvent {
     pub event_type: MouseEventType,
-    pub buttons: u8,
-    pub position: Point2d
+    pub left_button: bool,
+    pub middle_button: bool,
+    pub right_button: bool,
+    pub extra_button_1: bool,
+    pub extra_button_2: bool,
+    pub extra_button_3: bool,
+    pub extra_button_4: bool,
+    pub position: Point2d,
+    pub wheel_delta: i16
 }
-
 
 /// Represents a keyboard event like key down or key up.
 #[allow(dead_code)]
@@ -49,9 +54,12 @@ pub struct KeyboardEvent {
     pub event_type: KeyboardEventType,
     pub key_pressed: u16,
     pub character: char,
-    pub control: bool,
-    pub shift: bool,
-    pub alt: bool
+    pub left_control: bool,
+    pub left_shift: bool,
+    pub left_alt: bool,
+    pub right_control: bool,
+    pub right_shift: bool,
+    pub right_alt: bool,
 }
 
 /// Represents a window event like window moved or window resized.
@@ -60,7 +68,7 @@ pub struct KeyboardEvent {
 pub struct WindowEvent {
     pub event_type: WindowEventType,
     pub position: Point2d,
-    pub size: Size2d
+    pub size: Size2d,
 }
 
 /// Event object enumeration can be one of the valid event types.
@@ -69,5 +77,5 @@ pub struct WindowEvent {
 pub enum Event {
     Mouse(MouseEvent),
     Keyboard(KeyboardEvent),
-    Window(WindowEvent)
+    Window(WindowEvent),
 }
