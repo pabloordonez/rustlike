@@ -13,7 +13,7 @@ use std::char::from_u32;
 use windows::mouse::WindowsMouse;
 use windows::terminal::WindowsTerminal;
 use windows::winapi::um::consoleapi::{GetNumberOfConsoleInputEvents, ReadConsoleInputW, SetConsoleMode};
-use windows::winapi::um::wincon::{FOCUS_EVENT, INPUT_RECORD, KEY_EVENT, MOUSE_EVENT, ENABLE_WINDOW_INPUT, ENABLE_MOUSE_INPUT};
+use windows::winapi::um::wincon::{FOCUS_EVENT, INPUT_RECORD, KEY_EVENT, MOUSE_EVENT, ENABLE_WINDOW_INPUT, ENABLE_MOUSE_INPUT, MOUSE_MOVED, MOUSE_WHEELED, MOUSE_HWHEELED, DOUBLE_CLICK };
 use windows::window::WindowsWindow;
 use windows::Empty;
 
@@ -127,11 +127,18 @@ fn process_mouse_events(input_record: &INPUT_RECORD) -> Event {
     let mouse_event = unsafe { input_record.Event.MouseEvent() };
 
     Event::Mouse(MouseEvent {
-        event_type: MouseEventType::Click,
-        button_pressed: mouse_event.dwButtonState as u8,
+        event_type: match mouse_event.dwEventFlags {
+            0 => MouseEventType::Click,
+            MOUSE_MOVED => MouseEventType::MouseMove,
+            MOUSE_WHEELED => MouseEventType::HorizontalWheel,
+            MOUSE_HWHEELED => MouseEventType::VerticalWheel,
+            DOUBLE_CLICK => MouseEventType::DoubleClick,
+            _ => MouseEventType::MouseMove
+        },
+        buttons: mouse_event.dwButtonState as u8,
         position: Point2d::new(
             mouse_event.dwMousePosition.X as usize,
-            mouse_event.dwMousePosition.X as usize,
+            mouse_event.dwMousePosition.Y as usize,
         ),
     })
 }

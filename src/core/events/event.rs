@@ -3,18 +3,18 @@ use core::point_2d::Point2d;
 
 /// Enumerates all the possible mouse event types.
 #[allow(dead_code)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum MouseEventType {
     MouseMove,
-    MouseDown,
-    MouseUp,
     Click,
-    DoubleClick
+    DoubleClick,
+    HorizontalWheel,
+    VerticalWheel,
 }
 
 /// Enumerates all the possible keyboard event types.
 #[allow(dead_code)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum KeyboardEventType {
     KeyDown,
     KeyUp,
@@ -23,7 +23,7 @@ pub enum KeyboardEventType {
 
 /// Enumerates all the possible window event types.
 #[allow(dead_code)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum WindowEventType {
     WindowMove,
     WindowResize,
@@ -37,7 +37,7 @@ pub enum WindowEventType {
 #[derive(Debug, Copy, Clone)]
 pub struct MouseEvent {
     pub event_type: MouseEventType,
-    pub button_pressed: u8,
+    pub buttons: u8,
     pub position: Point2d
 }
 

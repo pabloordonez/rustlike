@@ -1,6 +1,6 @@
 // TODO: remove allow dead code.
 #[allow(dead_code)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub enum Color {
     Black,
