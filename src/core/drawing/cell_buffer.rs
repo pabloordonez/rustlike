@@ -1,7 +1,7 @@
-use core::cell::Cell;
-use core::color::Color;
-use core::point_2d::Point2d;
-use core::size_2d::Size2d;
+use core::drawing::cell::Cell;
+use core::drawing::color::Color;
+use core::drawing::point_2d::Point2d;
+use core::drawing::size_2d::Size2d;
 use std::slice::Iter;
 use std::str::Chars;
 

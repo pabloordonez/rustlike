@@ -1,5 +1,5 @@
-use core::events::event::{Key, KeyboardEvent, KeyboardEventType, MouseEvent};
-use core::point_2d::Point2d;
+use core::drawing::point_2d::Point2d;
+use core::events::event::MouseEvent;
 
 pub struct MouseState {
     pub left_button: bool,
@@ -10,10 +10,6 @@ pub struct MouseState {
     pub extra_button_3: bool,
     pub extra_button_4: bool,
     pub position: Point2d,
-}
-
-pub struct KeyboardState {
-    pub keys: [bool; 175],
 }
 
 impl MouseState {
@@ -39,22 +35,5 @@ impl MouseState {
         self.extra_button_3 = mouse.extra_button_3;
         self.extra_button_4 = mouse.extra_button_4;
         self.position = mouse.position;
-    }
-}
-
-impl KeyboardState {
-    pub fn new() -> KeyboardState {
-        KeyboardState { keys: [false; 175] }
-    }
-
-    pub fn update_from_event(&mut self, keyboard: KeyboardEvent) {
-        self.keys[keyboard.key.to_u32() as usize] =
-            keyboard.event_type == KeyboardEventType::KeyDown;
-        self.keys[Key::LeftShift.to_u32() as usize] = keyboard.left_shift;
-        self.keys[Key::LeftControl.to_u32() as usize] = keyboard.left_control;
-        self.keys[Key::LeftMenu.to_u32() as usize] = keyboard.left_menu;
-        self.keys[Key::RightShift.to_u32() as usize] = keyboard.right_shift;
-        self.keys[Key::RightControl.to_u32() as usize] = keyboard.right_control;
-        self.keys[Key::RightMenu.to_u32() as usize] = keyboard.right_menu;
     }
 }

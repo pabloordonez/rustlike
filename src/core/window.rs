@@ -1,5 +1,5 @@
-use core::point_2d::Point2d;
-use core::size_2d::Size2d;
+use core::drawing::point_2d::Point2d;
+use core::drawing::size_2d::Size2d;
 use core::Result;
 
 pub trait Window {

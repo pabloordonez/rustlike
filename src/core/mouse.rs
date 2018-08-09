@@ -1,4 +1,4 @@
-use core::point_2d::Point2d;
+use core::drawing::point_2d::Point2d;
 use core::Result;
 
 pub trait Mouse {

@@ -1,8 +1,8 @@
 extern crate winapi;
-use core::cell::Cell;
-use core::cell_buffer::CellBuffer;
-use core::point_2d::Point2d;
-use core::size_2d::Size2d;
+use core::drawing::cell::Cell;
+use core::drawing::cell_buffer::CellBuffer;
+use core::drawing::point_2d::Point2d;
+use core::drawing::size_2d::Size2d;
 use core::terminal::Terminal;
 use core::window::Window;
 use core::Result;

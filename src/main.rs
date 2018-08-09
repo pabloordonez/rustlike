@@ -5,12 +5,12 @@ use std::time::{Duration, Instant};
 mod core;
 mod windows;
 use core::application::Application;
-use core::cell::Cell;
-use core::cell_buffer::CellBuffer;
-use core::color::Color;
+use core::drawing::cell::Cell;
+use core::drawing::cell_buffer::CellBuffer;
+use core::drawing::color::Color;
+use core::drawing::point_2d::Point2d;
+use core::drawing::size_2d::Size2d;
 use core::events::event::{Event, KeyboardEventType, MouseEventType};
-use core::point_2d::Point2d;
-use core::size_2d::Size2d;
 use core::Result;
 use windows::application::WindowsApplication;
 

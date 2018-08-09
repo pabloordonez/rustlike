@@ -1,4 +1,4 @@
-use core::color::Color;
+use core::drawing::color::Color;
 
 #[inline]
 #[allow(dead_code)]

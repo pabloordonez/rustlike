@@ -1,4 +1,4 @@
-use core::color::Color;
+use core::drawing::color::Color;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Cell {

@@ -1,6 +1,6 @@
 extern crate winapi;
+use core::drawing::point_2d::Point2d;
 use core::mouse::Mouse;
-use core::point_2d::Point2d;
 use core::Result;
 use std::ptr::null_mut;
 use windows::winapi::shared::windef::{HWND, POINT};

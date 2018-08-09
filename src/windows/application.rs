@@ -1,13 +1,14 @@
 use core::application::Application;
-use core::events::device_state::KeyboardState;
-use core::events::device_state::MouseState;
+use core::drawing::point_2d::Point2d;
 use core::events::event::{
-    Event, Key, KeyboardEvent, KeyboardEventType, MouseEvent, MouseEventType, WindowEvent,
+    Event, KeyboardEvent, KeyboardEventType, MouseEvent, MouseEventType, WindowEvent,
     WindowEventType,
 };
 use core::events::event_queue::EventQueue;
+use core::input::key::Key;
+use core::input::keyboard_state::KeyboardState;
+use core::input::mouse_state::MouseState;
 use core::mouse::Mouse;
-use core::point_2d::Point2d;
 use core::terminal::Terminal;
 use core::window::Window;
 use core::Result;

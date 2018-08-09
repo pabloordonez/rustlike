@@ -4,7 +4,7 @@ use std::collections::vec_deque::VecDeque;
 #[allow(dead_code)]
 pub struct EventQueue {
     queue: VecDeque<Event>,
-    events: usize
+    events: usize,
 }
 
 #[allow(dead_code)]
@@ -12,7 +12,7 @@ impl EventQueue {
     pub fn new() -> EventQueue {
         EventQueue {
             queue: VecDeque::new(),
-            events: 0
+            events: 0,
         }
     }
 

@@ -1,6 +1,6 @@
-use core::events::device_state::KeyboardState;
-use core::events::device_state::MouseState;
 use core::events::event_queue::EventQueue;
+use core::input::keyboard_state::KeyboardState;
+use core::input::mouse_state::MouseState;
 use core::mouse::Mouse;
 use core::terminal::Terminal;
 use core::window::Window;
