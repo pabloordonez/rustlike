@@ -143,7 +143,7 @@ fn process_keyboard_events(keyboard: KeyboardEvent, buffer: &mut CellBuffer) {
     };
 
     buffer.write_string(
-        &format!("{} {}", keyboard.character, down),
+        &format!("{:?} {}", keyboard.key, down),
         Point2d::new(0, 2),
         Color::White,
         Color::DarkBlue,
@@ -161,7 +161,7 @@ fn process_keyboard_events(keyboard: KeyboardEvent, buffer: &mut CellBuffer) {
     );
 
     buffer.write_str(
-        if keyboard.left_alt {
+        if keyboard.left_menu {
             "left alt down"
         } else {
             "left alt up  "
@@ -194,7 +194,7 @@ fn process_keyboard_events(keyboard: KeyboardEvent, buffer: &mut CellBuffer) {
     );
 
     buffer.write_str(
-        if keyboard.right_alt {
+        if keyboard.right_menu {
             "right alt down"
         } else {
             "right alt up  "

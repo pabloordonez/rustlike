@@ -1,5 +1,4 @@
-use core::events::event::KeyboardEvent;
-use core::events::event::MouseEvent;
+use core::events::event::{Key, KeyboardEvent, KeyboardEventType, MouseEvent};
 use core::point_2d::Point2d;
 
 pub struct MouseState {
@@ -14,13 +13,7 @@ pub struct MouseState {
 }
 
 pub struct KeyboardState {
-    pub keys: [bool; 256],
-    pub left_control: bool,
-    pub left_shift: bool,
-    pub left_alt: bool,
-    pub right_control: bool,
-    pub right_shift: bool,
-    pub right_alt: bool,
+    pub keys: [bool; 175],
 }
 
 impl MouseState {
@@ -51,23 +44,17 @@ impl MouseState {
 
 impl KeyboardState {
     pub fn new() -> KeyboardState {
-        KeyboardState {
-            keys: [false; 256],
-            left_control: false,
-            left_shift: false,
-            left_alt: false,
-            right_control: false,
-            right_shift: false,
-            right_alt: false,
-        }
+        KeyboardState { keys: [false; 175] }
     }
 
     pub fn update_from_event(&mut self, keyboard: KeyboardEvent) {
-        self.left_control = keyboard.left_control;
-        self.left_shift = keyboard.left_shift;
-        self.left_alt = keyboard.left_alt;
-        self.right_control = keyboard.right_control;
-        self.right_shift = keyboard.right_shift;
-        self.right_alt = keyboard.right_alt;
+        self.keys[keyboard.key.to_u32() as usize] =
+            keyboard.event_type == KeyboardEventType::KeyDown;
+        self.keys[Key::LeftShift.to_u32() as usize] = keyboard.left_shift;
+        self.keys[Key::LeftControl.to_u32() as usize] = keyboard.left_control;
+        self.keys[Key::LeftMenu.to_u32() as usize] = keyboard.left_menu;
+        self.keys[Key::RightShift.to_u32() as usize] = keyboard.right_shift;
+        self.keys[Key::RightControl.to_u32() as usize] = keyboard.right_control;
+        self.keys[Key::RightMenu.to_u32() as usize] = keyboard.right_menu;
     }
 }
